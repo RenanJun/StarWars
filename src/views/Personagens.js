@@ -1,13 +1,14 @@
 import React, {Component} from "react";
-import{View, Image, Text, StyleSheet, TouchableOpacity} from "react-native";
+import{View, Image, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList} from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
-import { FlatList } from "react-native-gesture-handler";
+import axios from 'axios';
 
 export default class Filmes extends Component {
     constructor(){
         super();
         this.state = {
-            person: []
+            peoples: [],
+            listImg: ['luke.jpeg', 'starwars.png', 'starwars1.jpg', 'luke.jpeg'],
         }
     }
     buttonF = () => {
@@ -15,23 +16,66 @@ export default class Filmes extends Component {
     }
 
     componentDidMount() {
-        this.cartaz();
+        this.personagem();
+    }
+
+    person = () => {
+        this.props.navigation.navigate("Ator");
     }
     
-    cartaz(){
+    // personagem(){
+    //     const listIdPeople = [11, 5, 4, 13];
+    //     listIdPeople.forEach(async idPeople => {
+    //         await axios.get(`https://swapi.co/api/people/${idPeople}`)
+    //         .then(({data}) => {
+    //             const {id, name} = data;
+    //             console.log(data);
+    //             this.setState(prevState => ({people: [...prevState.people, {id: String(id), name}]}))
+            
+    //         });
+    // })
+    // }
+    fetchFilm(id) {
+        return axios.get(`https://swapi.co/api/people/${id}`)
+            .then(({data}) => {
+                const { episode_id, name } = data;
 
-        fetch('https://swapi.co/api/films/1')
-        .then(resposta => resposta.json())
-        .then(json => this.setState({person: json}))
+                const people = {
+                    id: String(episode_id),
+                    name
+                }
+
+                console.log(data)
+
+                this.setState(prevState => ({
+                    peoples: [...prevState.peoples, people ]
+                }))
+
+                return people
+            })
     }
-    renderItem = ({item}) => {
-        return (
-            <TouchableOpacity onPress={() => this.onItemPress(item)} style={{flexDirection: 'row', padding: 10, alignItems: 'center'}}>
-            <Image style={{height: 50, width: 50, borderRadius: 25}} source = {{uri: 'item'}}/>
-            <Text style ={{marginLeft: 10}}>{item.name}</Text>
-            </TouchableOpacity>
-        )
+    
+    async personagem() {
+
+    const listIdPeoples = [1, 5, 4, 13];
+    let i = -1
+    const peoplesLength = listIdPeoples.length
+
+    while (i++ < peoplesLength) {
+        await this.fetchFilm(listIdPeoples[i])
+        console.log('passou', i, listIdPeoples[i])
     }
+    }
+    verifica() {
+        for (let i = 0; i < 4; i++) {
+            if(this.setState.listImg[i] == this.setState.listIdPeoples[i]){
+                return this.setState.listImg[i];
+            }
+            
+        }
+        
+    }
+    
     render(){
         return(
             <View style = {styles.container}>
@@ -41,17 +85,38 @@ export default class Filmes extends Component {
                 </Text>
                 </View>
                 <View style = {styles.border}/>
+                
                 <View style ={styles.titulo}>
                     <Text style = {styles.textTitulo}>
                         Personagens
                     </Text>
-                </View>
-                <FlatList
-                keyExtractor={item => item.id}
-                data={this.state.person}
-                ItemSeparatorComponent={()=>
-                    <View style={{flex: 1, height:1, backgroundColor: '#f7f7f7'}}/>}
-                />
+                    
+                     </View>
+                     <View style={{flex: 1, alignItems: 'center'}}>
+                     <FlatList 
+                    data={this.state.peoples}
+                    ref='flatlist'
+                    numColumns={2}
+                    keyExtractor={item => item.id}
+                 
+                    renderItem={({item}) =>
+                    <TouchableOpacity onPress={this.person}>
+                        <View style={{alignItems: 'center', marginTop: 40}}>
+                        <Image style={{width: 150, height: 150,  borderRadius: 70}} source = {require('../images/luke.jpeg')}/>
+                        <View style={{width:180}}>
+                        </View>
+                        <View style={{width: 150, height: 20, borderBottomLeftRadius: 5, borderBottomRightRadius:5}}>
+                        <View style={{left: 20}}>
+                        <Text style={{color: "#FFFFFF", fontSize: 14, fontWeight: 'bold'}}>{item.name}</Text>
+                        </View>
+                        </View>
+                        </View>
+                        </TouchableOpacity>
+                   
+
+                    }/>
+                     </View>
+                     <View style={{paddingVertical: 10}}></View>
                 <View style={styles.button}>
                 <TouchableOpacity onPress={this.buttonP}>
                 <View style={styles.buttonP}>
@@ -137,7 +202,6 @@ const styles = StyleSheet.create({
     },
     
     button: {
-        flex: 1,
         alignItems:'flex-end',
         justifyContent: 'center',
         flexDirection: 'row'

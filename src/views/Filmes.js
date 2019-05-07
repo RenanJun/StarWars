@@ -1,6 +1,5 @@
 import React, {Component} from "react";
-import{View, Image, Text, StyleSheet, TouchableOpacity} from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import{View, Image, Text, StyleSheet, TouchableOpacity, FlatList} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import axios from 'axios';
 
@@ -19,98 +18,41 @@ export default class Filmes extends Component {
     buttonP = () => {
          this.props.navigation.navigate('Personagens');
     }
+    phantom = () =>{
+        this.props.navigation.navigate('Phantom');
+    }
+
+    fetchFilm(id) {
+        return axios.get(`https://swapi.co/api/films/${id}`)
+            .then(({data}) => {
+                const { episode_id, title } = data;
+
+                const film = {
+                    id: String(episode_id),
+                    title
+                }
+
+                console.log(data)
+
+                this.setState(prevState => ({
+                    films: [...prevState.films, film ]
+                }))
+
+                return film
+            })
+    }
     
-    cartaz() {
+    async cartaz() {
 
-    //     const url = 'https://swapi.co/api';
+    const listIdFilms = [4, 5, 1, 2];
+    let i = -1
+    const filmsLength = listIdFilms.length
 
-    //     // const requestInfo={
-
-    //     //     method: 'GET',
-    //     //     body: JSON.stringify({
-    //     //         films: this.state.films,
-    //     //     }),
-    //     //     headers : new Headers({
-    //     //         'Content-type' : 'application/json'
-    //     //     })
-    //     // }
-
-    //     // fetch(url).then((response) => {
-    //     //     console.log(response);
-    //     // });
-    const listIdFilms = [1, 2, 3, 4];
-    listIdFilms.forEach(idFilm => {
-        axios.get(`https://swapi.co/api/films/${idFilm}`)
-        .then(({data}) => {
-            const { episode_id, title } = data;
-            console.log(data)
-            this.setState(prevState => ({films: [...prevState.films, {id: String(episode_id), title}]}))
-        })
-    });
-        
-        // fetch('https://swapi.co/api/films/1')
-        // .then((resposta) => {
-        //     this.setState({films: resposta.json()});
-        // });
-        // .then(json => this.setState({films: json}))
+    while (i++ < filmsLength) {
+        await this.fetchFilm(listIdFilms[i])
+        console.log('passou', i, listIdFilms[i])
     }
-
-    // async componentDidMount(){
-    //     const timestamp = Number(new Date())
-    //     const hash = md5.create()
-    //     hash.update(timestamp + PRIVATE_KEY + PUBLIC_KEY)
-
-    //     const response = await fetch('http https://swapi.co/api/films/1/')
-    //     const responseJson = await response.json()
-    //     this.setState({films: responseJson.films.results})
-    // }
-
-    // cartaz(){
-
-    //     const uri =  "https://swapi.co/api/films/1/";
-
-    //     const requestInfo = {
-
-    //         method: 'GET',
-    //         body: JSON.stringify({
-
-    //             "reset_form": {
-
-    //                    "films": this.get.films,
-
-    //                }
-                   
-    //             }),
-
-    //         headers : new Headers({
-
-    //             'Content-type' : 'application/json'
-
-    //         })
-
-    //     }
-        
-    //     fetch(uri, requestInfo)
-    //     .then(response => {response.json()})
-    //     .then(json => this.setState({films: json}))
-
-    //     .catch(e => this.setState({films: e.films}))
-
-    // }       
-    
-    renderItem = ({item}) => {
-        return (
-            <TouchableOpacity onPress={() => this.onItemPress(item)} style={{flexDirection: 'row', padding: 10, alignItems: 'center'}}>
-            <Image style={{height: 50, width: 50, borderRadius: 25}} source = {{uri: 'item'}}/>
-            <Text style ={{marginLeft: 10}}>{item.name}</Text>
-            </TouchableOpacity>
-        )
     }
-
-    onItemPress = (item) => {
-        this.props.navigation.navigate('Filmes', {films: item})
-    }
-
     render(){
         return(
             <View style = {styles.container}>
@@ -124,27 +66,40 @@ export default class Filmes extends Component {
                     <Text style = {styles.textTitulo}>
                         Filmes
                     </Text>
-                </View>
-                {/* <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                    <FlatList
-                    keyExtractor={item => item.id}
+                 </View>
+                 <View style={{flex: 1}}>
+
+                 <FlatList 
                     data={this.state.films}
+                    ref='flatlist'
+                    numColumns={2}
+                    keyExtractor={item => item.id}
+                    // ItemSeparatorComponent={()=>
+                    //     <View style={{left: 20}}>
+
+                    //         <Image></Image>
+                    //     </View>
+                        
+                    //     }
                     renderItem={({item}) =>
-                    <Post foto={item}/> 
-                }
-                    />
-                    <Image source={{uri: this.props.films}} 
-                    style={styles.films}/>
-                </View> */}
-                <FlatList
-                data={this.state.films}
-                ref='flatlist'
-                // renderItem={this._renderItem}
-                keyExtractor={item => item.id}
-                ItemSeparatorComponent={()=>
-                    <View style={{flex: 1, height:1, backgroundColor: '#f7f7f7'}}/>}
-                renderItem={({item}) => <Text style={{color: "#FFF"}}>{item.title}</Text>}
-                />
+                    <View style={{flex: 1, alignItems: 'center'}}>
+
+                    <TouchableOpacity onPress={this.phantom}>
+
+                    <View style={{alignItems: 'center',marginTop: 20}}>
+                    <Image style={{width: 150, height: 220}} source = {require('../images/starwars1.jpg')}/>
+                    <View style={{width:180}}>
+                    </View>
+                    <View style={{alignItems: 'center', justifyContent: 'center',backgroundColor: '#FFFFFF',width: 150, height: 50, borderBottomLeftRadius: 5, borderBottomRightRadius:5}}>
+                    <Text style={{color: "#000000", fontSize: 14, fontWeight: 'bold'}}>{item.title}</Text>
+                    </View>
+                    
+                    </View>
+                    </TouchableOpacity>
+                    </View>
+                    }/>
+                 </View>
+                <View style={{paddingVertical: 10}}></View>
                 <View style={styles.button}>
                 <TouchableOpacity onPress={this.buttonP}>
                 <View style={styles.buttonP}>
@@ -178,7 +133,7 @@ const styles = StyleSheet.create({
     barra:{
         marginTop: 45,
         alignItems: 'center',
-        // borderBottomEndRadius: 0,
+        
         
     },
 
@@ -231,7 +186,6 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        flex: 1,
         alignItems:'flex-end',
         justifyContent: 'center',
         flexDirection: 'row'
