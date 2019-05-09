@@ -4,61 +4,55 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import axios from "axios";
 
 export default class Filmes extends Component {
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
+        const idPerson = this.props.navigation.getParam('id_person');
+        console.log('ID >>', idPerson)
         this.state = {
             peoples:[],
             homes:[],
             films:[],
+            // specys: [],
+            id: idPerson,
         }
     }
     back = () => {
-        this.props.navigation.navigate("Personagens");
+        this.props.navigation.goBack(null);
     }
-    phantom = () => {
-        this.props.navigation.navigate("Phantom");
+    phantom = (item) => {
+        console.log('Item',item)
+        const filmID = item.url.match(/\d+/g)[0]
+        this.props.navigation.navigate("FilmesAtor", {
+            id_page: filmID
+        });
     }
     componentDidMount(){
-        this.ator();
-        this.homeworld();
-        this.cartaz();
-        
+        console.log('AQUI!!!!!!', this.state.id)
+        this.ator(this.state.id);
+        console.log(this.state.films)
+        console.log(this.state.homes)
     }
 
-    homeworld(){
-        return axios.get(`https://swapi.co/api/planets/1/`)
-        .then(({data}) => {
-            const { episode_id, name} = data;
-
-            const home = {
-                id: String(episode_id),
-                name
-            }
-
-            console.log(data)
-
-            this.setState(prevState => ({
-                homes: [...prevState.homes, home ]
-            }))
-
-            return home
-        })
-    }
-
-    ator() {
-        return axios.get(`https://swapi.co/api/people/1/`)
+    ator(id) {
+        return axios.get(`https://swapi.co/api/people/${id}`)
             .then(({data}) => {
-                const { episode_id, birth_year, gender, specy, films} = data;
+                const { episode_id, birth_year, gender, species, name, films, homeworld} = data;
 
                 const people = {
                     id: String(episode_id),
+                    name,
                     birth_year,
                     gender,
-                    specy, 
-                    films
+                    species, 
+                    films,
+                    homeworld
                 }
-
-                console.log(data)
+                console.log(data.homeworld)
+                this.fetchActorFilms(films)
+                this.fetchActorHomeworld(homeworld)
+                // console.log('HomeWorld', homeworld)
+                // console.log('AAAAAa', specy)
+                console.log(id)
 
                 this.setState(prevState => ({
                     peoples: [...prevState.peoples, people ]
@@ -68,63 +62,79 @@ export default class Filmes extends Component {
             })
     }
 
-    fetchFilm(id) {
-        return axios.get(`https://swapi.co/api/films/${id}`)
-            .then(({data}) => {
-                const { episode_id, title } = data;
-
-                const film = {
-                    id: String(episode_id),
-                    title
-                }
-
-                console.log(data)
-
-                this.setState(prevState => ({
-                    films: [...prevState.films, film ]
-                }))
-
-                return film
+    fetchActorFilms(filmsArray) {
+        return Array.isArray(filmsArray) &&
+            filmsArray.forEach(film => {
+                axios.get(film)
+                    .then(({ data }) => {
+                        this.setState(prevState => ({
+                            films: [
+                                ...prevState.films,
+                                data
+                            ]
+                        }))
+                    })
             })
     }
-    async cartaz() {
 
-        const listIdFilms = [2, 6, 4];
-        let i = -1
-        const filmsLength = listIdFilms.length
+    // fetchActorHomeworld(homes) {
+    //     return homes &&
+    //     homes(home => {
+    //         axios.get(home)
+    //         .then(({data}) => {
+    //             this.setState(prevState => ({
+    //                 homes: [
+    //                     ...prevState.homes,
+    //                     data
+    //                 ]
+    //             }))
+    //         })
+    //     })
+    // }
+
+    // fetchActorSpecy(specyArray) {
+    //     return Array.isArray(specyArray) &&
+    //         specyArray.forEach(specy => {
+    //             axios.get(specy)
+    //                 .then(({ data }) => {
+    //                     this.setState(prevState => ({
+    //                         specys: [
+    //                             ...prevState.specys,
+    //                             data
+    //                         ]
+    //                     }))
+    //                 })
+    //         })
+    // }
     
-        while (i++ < filmsLength) {
-            await this.fetchFilm(listIdFilms[i])
-            console.log('passou', i, listIdFilms[i])
-        }
-        }
     
     render(){
         return(
             <View style = {styles.container}>
-                <View style = {styles.barra}>
-                <Text style={styles.status}>
-                    Luke Skywalkerv
-                </Text>
-                </View>
-                <View style = {styles.border}/>
-                <View style ={{left: 20, marginTop: -50}}>
-                <TouchableOpacity onPress={this.back}>
-                <Icon name = "ios-arrow-round-back" color="#FFFFFF" size={35}/>
-                </TouchableOpacity>
-                </View>
-                <View style={{marginTop: 30}}>
-                <Image style={{width: 375, height: 190}} source={require('../images/luke.jpeg')}/>
-                <View style={styles.borda}/>
-                <View style={styles.borda}/>
-                </View>
-                <View style={{}}>
+                <View style={{flex: 1}}>
                 <FlatList 
                     data={this.state.peoples}
                     ref='flatlist'
                     keyExtractor={item => item.id}
                     renderItem={({item}) =>
-                    <View style={{}}>
+                    <View style={{flex: 1}}>
+                    <View style = {styles.container}>
+
+                    <View style = {styles.barra}>
+                    <Text style={styles.status}>{item.name}</Text>
+                    </View>
+                    <View style = {styles.border}/>
+                    <View style ={{left: 20, marginTop: -50}}>
+                    <TouchableOpacity onPress={this.back}>
+                    <Icon name = "ios-arrow-round-back" color="#FFFFFF" size={35}/>
+                    </TouchableOpacity>
+                    </View>
+                    <View style={{marginTop: 30}}>
+                <Image style={{width: 375, height: 190}} source={require('../images/luke.jpeg')}/>
+                <View style={styles.borda}/>
+                <View style={styles.borda}/>
+                </View>
+                    </View>
                     <View style={{marginTop: 30, left: 20}}>
                         <Text style={styles.titulo}>Birth Year</Text>
                         <Text style={styles.texto}>{item.birth_year}</Text>
@@ -135,35 +145,32 @@ export default class Filmes extends Component {
                         <View>
                         <View style={{marginTop: 30}}>
                         <Text style={styles.titulo}>Specy</Text>
-                        <Text style={styles.texto}></Text>
+                        <Text style={styles.texto}>{item.species}</Text>
                         </View>
                         <View style={{left: 150, marginTop:-30}}>
                         <Text style={styles.titulo}>Homeworld</Text>
+                        <Text style={styles.texto}>{item.homeworld}</Text>
                         </View>
                         </View>
                         
                     </View>
-                    </View>
-                    }/>
-                    <FlatList 
+                    <FlatList
                     data={this.state.homes}
                     ref='flatlist'
                     keyExtractor={item => item.id}
                     renderItem={({item}) =>
-                    <View style={{}}>
-                    <View style={{marginTop: 15, left: 20}}>
-                        <View style={{left: 150, marginTop: -30}}>
-                        <Text></Text>
-                        <Text style={styles.texto}>{item.name}</Text>
-                        </View>
-                        <View style={{marginTop: -28}}>
-                        <Text></Text>
-                        <Text style={styles.texto}>Human</Text>
+                    <View>
+                        <View style = {{flex: 1}}>
+                            <Text style={styles.status}>
+                                {item.name}
+                            </Text>
                         </View>
                     </View>
+                }
+                    />
                     </View>
-                  
                     }/>
+
                     <View style={{right: 10}}>
                     <View style={styles.pageD}>
                     <Icon name = "ios-videocam" size={25} color = '#FFFF00'/>
@@ -179,8 +186,8 @@ export default class Filmes extends Component {
                     ref='flatlist'
                     keyExtractor={item => item.id}
                     renderItem={({item}) =>
-                    <View style={{}}>
-                    <TouchableOpacity onPress={this.phantom}>
+                    <View style={{flex: 1}}>
+                    <TouchableOpacity onPress={()=>this.phantom(item)}>
                     <View style={{left: 20, marginTop: 20}}>
                     <Text style={styles.texto}>{item.title}</Text>
                     </View>

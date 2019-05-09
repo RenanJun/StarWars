@@ -5,54 +5,33 @@ import axios from 'axios';
 
 export default class Filmes extends Component {
 
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
-            films:[]
+            films:[],
         }
     }
     componentDidMount() {
-        this.cartaz();
+        this.fetchFilm();
     }
 
     buttonP = () => {
          this.props.navigation.navigate('Personagens');
     }
-    phantom = () =>{
-        this.props.navigation.navigate('Phantom');
+    phantom = (item) => {
+        const urlID = item.url.match(/\d+/g)[0]
+        this.props.navigation.navigate('FilmeCartaz', {
+            id_film: urlID,
+        });
     }
 
-    fetchFilm(id) {
-        return axios.get(`https://swapi.co/api/films/${id}`)
+     fetchFilm() {
+        return axios.get(`https://swapi.co/api/films/`)
             .then(({data}) => {
-                const { episode_id, title } = data;
-
-                const film = {
-                    id: String(episode_id),
-                    title
-                }
-
-                console.log(data)
-
-                this.setState(prevState => ({
-                    films: [...prevState.films, film ]
-                }))
-
-                return film
+                this.setState({films: data.results})
             })
     }
-    
-    async cartaz() {
 
-    const listIdFilms = [4, 5, 1, 2];
-    let i = -1
-    const filmsLength = listIdFilms.length
-
-    while (i++ < filmsLength) {
-        await this.fetchFilm(listIdFilms[i])
-        console.log('passou', i, listIdFilms[i])
-    }
-    }
     render(){
         return(
             <View style = {styles.container}>
@@ -74,20 +53,14 @@ export default class Filmes extends Component {
                     ref='flatlist'
                     numColumns={2}
                     keyExtractor={item => item.id}
-                    // ItemSeparatorComponent={()=>
-                    //     <View style={{left: 20}}>
-
-                    //         <Image></Image>
-                    //     </View>
-                        
-                    //     }
+                    
                     renderItem={({item}) =>
                     <View style={{flex: 1, alignItems: 'center'}}>
 
-                    <TouchableOpacity onPress={this.phantom}>
+                    <TouchableOpacity onPress={() => this.phantom(item)}>
 
                     <View style={{alignItems: 'center',marginTop: 20}}>
-                    <Image style={{width: 150, height: 220}} source = {require('../images/starwars1.jpg')}/>
+                    <Image style={{width: 150, height: 220}} source = {require('../images/starwars3.jpg')}/>
                     <View style={{width:180}}>
                     </View>
                     <View style={{alignItems: 'center', justifyContent: 'center',backgroundColor: '#FFFFFF',width: 150, height: 50, borderBottomLeftRadius: 5, borderBottomRightRadius:5}}>

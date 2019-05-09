@@ -3,11 +3,11 @@ import{View, Image, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList} fr
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 
-export default class Filmes extends Component {
+export default class Personagens extends Component {
     constructor(){
         super();
         this.state = {
-            peoples: [],
+            peloples:[],
             listImg: ['luke.jpeg', 'starwars.png', 'starwars1.jpg', 'luke.jpeg'],
         }
     }
@@ -16,56 +16,54 @@ export default class Filmes extends Component {
     }
 
     componentDidMount() {
-        this.personagem();
+        this.fetchPeople();
     }
 
-    person = () => {
-        this.props.navigation.navigate("Ator");
+    person = (item) => {
+        const urlID = item.url.match(/\d+/g)[0]
+        this.props.navigation.navigate("Ator", {
+            id_person: urlID
+        });
     }
-    
-    // personagem(){
-    //     const listIdPeople = [11, 5, 4, 13];
-    //     listIdPeople.forEach(async idPeople => {
-    //         await axios.get(`https://swapi.co/api/people/${idPeople}`)
-    //         .then(({data}) => {
-    //             const {id, name} = data;
-    //             console.log(data);
-    //             this.setState(prevState => ({people: [...prevState.people, {id: String(id), name}]}))
-            
-    //         });
-    // })
-    // }
-    fetchFilm(id) {
-        return axios.get(`https://swapi.co/api/people/${id}`)
+
+     fetchPeople() {
+        return axios.get(`https://swapi.co/api/people/?page=1`)
             .then(({data}) => {
-                const { episode_id, name } = data;
-
-                const people = {
-                    id: String(episode_id),
-                    name
-                }
-
-                console.log(data)
-
-                this.setState(prevState => ({
-                    peoples: [...prevState.peoples, people ]
-                }))
-
-                return people
+               this.setState({peoples: data.results})
             })
     }
+
+    // fetchPerson2() {
+    //     return axios.get(`https://swapi.co/api/people/?page=2`)
+    //         .then(({data}) => {
+    //             const { episode_id, name } = data;
+
+    //             const people = {
+    //                 id_person2: String(episode_id),
+    //                 name
+    //             }
+
+    //             console.log(data)
+
+    //             this.setState({people2: data.results})
+
+    //             return people
+    //         })
+    // }
     
-    async personagem() {
+    
+    // async personagem() {
 
-    const listIdPeoples = [1, 5, 4, 13];
-    let i = -1
-    const peoplesLength = listIdPeoples.length
+    // const listIdPeoples = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+    // 15, 16, 17, 18, 19, 20, 21];
+    // let i = -1
+    // const peoplesLength = listIdPeoples.length
 
-    while (i++ < peoplesLength) {
-        await this.fetchFilm(listIdPeoples[i])
-        console.log('passou', i, listIdPeoples[i])
-    }
-    }
+    // while (i++ < peoplesLength) {
+    //     await this.fetchPerson(listIdPeoples[i])
+    //     console.log('passou', i, listIdPeoples[i])
+    // }
+    // }
     verifica() {
         for (let i = 0; i < 4; i++) {
             if(this.setState.listImg[i] == this.setState.listIdPeoples[i]){
@@ -100,7 +98,7 @@ export default class Filmes extends Component {
                     keyExtractor={item => item.id}
                  
                     renderItem={({item}) =>
-                    <TouchableOpacity onPress={this.person}>
+                    <TouchableOpacity onPress={() => this.person(item)}>
                         <View style={{alignItems: 'center', marginTop: 40}}>
                         <Image style={{width: 150, height: 150,  borderRadius: 70}} source = {require('../images/luke.jpeg')}/>
                         <View style={{width:180}}>
@@ -112,9 +110,8 @@ export default class Filmes extends Component {
                         </View>
                         </View>
                         </TouchableOpacity>
-                   
-
                     }/>
+                     
                      </View>
                      <View style={{paddingVertical: 10}}></View>
                 <View style={styles.button}>
