@@ -13,7 +13,7 @@ const AppNavigator = createStackNavigator({
     FilmeCartaz,
     Ator,
     FilmesAtor
-}, {initialRouteName: 'Personagens',
+}, {initialRouteName: 'Home',
 defaultNavigationOptions: {
     header: null,
 }});

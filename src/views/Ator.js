@@ -12,7 +12,7 @@ export default class Filmes extends Component {
             peoples:[],
             homes:[],
             films:[],
-            // specys: [],
+            specys: [],
             id: idPerson,
         }
     }
@@ -47,9 +47,11 @@ export default class Filmes extends Component {
                     films,
                     homeworld
                 }
-                console.log(data.homeworld)
+
+                // console.log(data.homeworld)
                 this.fetchActorFilms(films)
-                this.fetchActorHomeworld(homeworld)
+                this.fetchActorSpecy(species)
+                // this.fetchActorHomeworld(homeworld)
                 // console.log('HomeWorld', homeworld)
                 // console.log('AAAAAa', specy)
                 console.log(id)
@@ -77,6 +79,8 @@ export default class Filmes extends Component {
             })
     }
 
+    fetchActorHomeworld
+
     // fetchActorHomeworld(homes) {
     //     return homes &&
     //     homes(home => {
@@ -92,26 +96,27 @@ export default class Filmes extends Component {
     //     })
     // }
 
-    // fetchActorSpecy(specyArray) {
-    //     return Array.isArray(specyArray) &&
-    //         specyArray.forEach(specy => {
-    //             axios.get(specy)
-    //                 .then(({ data }) => {
-    //                     this.setState(prevState => ({
-    //                         specys: [
-    //                             ...prevState.specys,
-    //                             data
-    //                         ]
-    //                     }))
-    //                 })
-    //         })
-    // }
+    fetchActorSpecy(specyArray) {
+        return Array.isArray(specyArray) &&
+            specyArray.forEach(specy => {
+                axios.get(specy)
+                    .then(({ data }) => {
+                        this.setState(prevState => ({
+                            specys: [
+                                ...prevState.specys,
+                                data
+                            ]
+                        }))
+                    })
+            })
+    }
     
     
     render(){
         return(
             <View style = {styles.container}>
                 <View style={{flex: 1}}>
+                <View>
                 <FlatList 
                     data={this.state.peoples}
                     ref='flatlist'
@@ -119,7 +124,6 @@ export default class Filmes extends Component {
                     renderItem={({item}) =>
                     <View style={{flex: 1}}>
                     <View style = {styles.container}>
-
                     <View style = {styles.barra}>
                     <Text style={styles.status}>{item.name}</Text>
                     </View>
@@ -142,34 +146,27 @@ export default class Filmes extends Component {
                         <Text style={styles.titulo}>Gender</Text>
                         <Text style={styles.texto}>{item.gender}</Text>
                         </View>
-                        <View>
-                        <View style={{marginTop: 30}}>
-                        <Text style={styles.titulo}>Specy</Text>
-                        <Text style={styles.texto}>{item.species}</Text>
-                        </View>
-                        <View style={{left: 150, marginTop:-30}}>
-                        <Text style={styles.titulo}>Homeworld</Text>
-                        <Text style={styles.texto}>{item.homeworld}</Text>
-                        </View>
-                        </View>
-                        
                     </View>
-                    <FlatList
-                    data={this.state.homes}
+                    </View>
+                    }/>
+
+                    <FlatList 
+                    data={this.state.specys}
                     ref='flatlist'
                     keyExtractor={item => item.id}
                     renderItem={({item}) =>
-                    <View>
-                        <View style = {{flex: 1}}>
-                            <Text style={styles.status}>
-                                {item.name}
-                            </Text>
-                        </View>
+                    <View style={{flex: 1}}>
+                    
+                    <View style={{left: 20, marginTop: 10}}>
+                    <Text style={styles.titulo}>
+                        Specy
+                    </Text>
+                    <Text style={styles.texto}>{item.name}</Text>
                     </View>
-                }
-                    />
+                    
                     </View>
                     }/>
+                </View>
 
                     <View style={{right: 10}}>
                     <View style={styles.pageD}>
@@ -180,6 +177,9 @@ export default class Filmes extends Component {
                     <Text style={{color: '#FFFF00', fontWeight: 'bold', fontSize: 18}}>
                         Films
                     </Text>
+                    </View>
+                    <View>
+
                     </View>
                     <FlatList 
                     data={this.state.films}

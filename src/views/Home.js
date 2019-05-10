@@ -31,7 +31,6 @@ export default class Home extends Component {
 
     }
     
-
     fetchFilm(id) {
         return axios.get(`https://swapi.co/api/films/${id}`)
             .then(({data}) => {
