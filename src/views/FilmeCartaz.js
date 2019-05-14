@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import{View, Image, Text, StyleSheet, TouchableOpacity, FlatList} from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from "axios";
+import { getMovieImage } from "../helpers";
 
 export default class FilmesCartaz extends Component {
 
@@ -73,7 +74,7 @@ export default class FilmesCartaz extends Component {
                     </View>
                     </View>
                     <View style={{marginTop: 30, left: 20}}>
-                    <Image style={{width: 150, height: 220}}source={require('../images/starwars3.jpg')}/>
+                    <Image style={{width: 150, height: 220}}source={getMovieImage(item.title)}/>
                     </View>
                     <View style={{paddingVertical: -100, left: 200, marginTop: -220, width: 180, height: 280}}>
                     <Text style={styles.titulo}>Director</Text>
@@ -116,12 +117,14 @@ const styles = StyleSheet.create({
     },
 
     status:{
+        fontFamily: 'Exo-ExtraBold',    
         color: '#FFFF00',
         fontSize: 18,
         fontWeight: 'bold'
     },
 
     titulo: {
+        fontFamily: 'Exo-ExtraBold',
         fontSize: 12,
         color: '#FFFFFF',
     },
@@ -132,6 +135,7 @@ const styles = StyleSheet.create({
     },
 
     texto: {
+        fontFamily: 'Exo-ExtraBold',
         fontSize: 14,
         color: '#FFFFFF',
         fontWeight: 'bold',

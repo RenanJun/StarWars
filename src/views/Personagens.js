@@ -2,21 +2,21 @@ import React, {Component} from "react";
 import{View, Image, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList} from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
+import { getActorImage } from '../helpers'
 
 export default class Personagens extends Component {
     constructor(){
         super();
         this.state = {
-            peloples:[],
-            listImg: ['luke.jpeg', 'starwars.png', 'starwars1.jpg', 'luke.jpeg'],
+            peoples:[],
         }
     }
     buttonF = () => {
         this.props.navigation.navigate("Filmes");
     }
 
-    componentDidMount() {
-        this.fetchPeople();
+  async  componentDidMount() {
+      await  this.fetchPeople();
     }
 
     person = (item) => {
@@ -27,51 +27,18 @@ export default class Personagens extends Component {
     }
 
      fetchPeople() {
-        return axios.get(`https://swapi.co/api/people/?page=1`)
-            .then(({data}) => {
-               this.setState({peoples: data.results})
-            })
-    }
-
-    // fetchPerson2() {
-    //     return axios.get(`https://swapi.co/api/people/?page=2`)
-    //         .then(({data}) => {
-    //             const { episode_id, name } = data;
-
-    //             const people = {
-    //                 id_person2: String(episode_id),
-    //                 name
-    //             }
-
-    //             console.log(data)
-
-    //             this.setState({people2: data.results})
-
-    //             return people
-    //         })
-    // }
-    
-    
-    // async personagem() {
-
-    // const listIdPeoples = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-    // 15, 16, 17, 18, 19, 20, 21];
-    // let i = -1
-    // const peoplesLength = listIdPeoples.length
-
-    // while (i++ < peoplesLength) {
-    //     await this.fetchPerson(listIdPeoples[i])
-    //     console.log('passou', i, listIdPeoples[i])
-    // }
-    // }
-    verifica() {
-        for (let i = 0; i < 4; i++) {
-            if(this.setState.listImg[i] == this.setState.listIdPeoples[i]){
-                return this.setState.listImg[i];
-            }
-            
-        }
         
+        axios.get('https://swapi.co/api/people/?page=1').then((data) => {
+            this.setState({peoples: data.data.results});
+            console.log(data.data.results, 'Data aqui 2');
+            
+            axios.get('https://swapi.co/api/people/?page=2').then((data) => {
+            this.setState(prevState => ({
+                peoples: [...prevState.peoples, ...data.data.results]}))
+            console.log(data.data.results, 'Data aqui 1');
+            console.log(this.state.peoples)
+        })
+        })
     }
     
     render(){
@@ -93,6 +60,7 @@ export default class Personagens extends Component {
                      <View style={{flex: 1, alignItems: 'center'}}>
                      <FlatList 
                     data={this.state.peoples}
+                    extraData={this.state.listImg}
                     ref='flatlist'
                     numColumns={2}
                     keyExtractor={item => item.id}
@@ -100,12 +68,12 @@ export default class Personagens extends Component {
                     renderItem={({item}) =>
                     <TouchableOpacity onPress={() => this.person(item)}>
                         <View style={{alignItems: 'center', marginTop: 40}}>
-                        <Image style={{width: 150, height: 150,  borderRadius: 70}} source = {require('../images/luke.jpeg')}/>
+                        <Image style={{width: 150, height: 150,  borderRadius: 70}} source = {getActorImage(item.name)}/>
                         <View style={{width:180}}>
                         </View>
                         <View style={{width: 150, height: 20, borderBottomLeftRadius: 5, borderBottomRightRadius:5}}>
                         <View style={{left: 20}}>
-                        <Text style={{color: "#FFFFFF", fontSize: 14, fontWeight: 'bold'}}>{item.name}</Text>
+                        <Text style={styles.texto}>{item.name}</Text>
                         </View>
                         </View>
                         </View>
@@ -114,19 +82,20 @@ export default class Personagens extends Component {
                      
                      </View>
                      <View style={{paddingVertical: 10}}></View>
+                     <View style={styles.borderT}/>
                 <View style={styles.button}>
                 <TouchableOpacity onPress={this.buttonP}>
                 <View style={styles.buttonP}>
-                    <Icon name = "ios-person" size={20}/>
-                    <Text style={styles.textButton}>
+                    <Icon name = "ios-person" color = "#FFFF00" size={20}/>
+                    <Text style={styles.textButtonP}>
                         Personagens
                     </Text>
                 </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={this.buttonF}>
                 <View style={styles.buttonF}>
-                    <Icon name = "ios-videocam" size={20}/>
-                    <Text style={styles.textButton}>
+                    <Icon name = "ios-videocam" color = "#808080" size={20}/>
+                    <Text style={styles.textButtonM}>
                         Filmes
                     </Text>
                 </View>
@@ -146,7 +115,6 @@ const styles = StyleSheet.create({
     barra:{
         marginTop: 45,
         alignItems: 'center',
-        // borderBottomEndRadius: 0,
         
     },
 
@@ -157,20 +125,22 @@ const styles = StyleSheet.create({
     },
 
     status:{
+        fontFamily: 'Exo-ExtraBold',
         color: '#FFFF00',
         fontSize: 18,
         fontWeight: 'bold',
     },
 
     titulo: {
+        fontFamily: 'Exo-ExtraBold',
         marginTop: 20,
         left: 20,
     },
     
     textTitulo:{
+        fontFamily: 'Exo-ExtraBold',
         color: '#FFFFFF',
         fontSize: 28,
-        //fontFamily: '',
     },
 
     films: {
@@ -183,7 +153,13 @@ const styles = StyleSheet.create({
         height: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFF00'
+        backgroundColor: '#000000'
+    },
+    texto:{
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fontFamily: 'Exo-ExtraBold',
     },
 
     buttonF: {
@@ -191,12 +167,26 @@ const styles = StyleSheet.create({
         height: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#000000'
+    },
+    borderT: {
+        marginTop: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#FFFF00'
     },
 
-    textButton: {
+    textButtonP: {
+        color: "#FFFF00",
+        fontFamily: 'Exo-ExtraBold',
         fontSize: 12,
     },
+
+    textButtonM: {
+        color: "#808080",
+        fontFamily: 'Exo-ExtraBold',
+        fontSize: 12,
+    },
+    
     
     button: {
         alignItems:'flex-end',

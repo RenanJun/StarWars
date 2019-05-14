@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import{View, Image, Text, StyleSheet, TouchableOpacity, FlatList} from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from "axios";
+import { getActorImage } from '../helpers';
 
 export default class Filmes extends Component {
     constructor(props){
@@ -15,6 +16,7 @@ export default class Filmes extends Component {
             specys: [],
             id: idPerson,
         }
+
     }
     back = () => {
         this.props.navigation.goBack(null);
@@ -38,6 +40,16 @@ export default class Filmes extends Component {
             .then(({data}) => {
                 const { episode_id, birth_year, gender, species, name, films, homeworld} = data;
 
+                const id = data.homeworld.match(/\d+/g)[0]
+                console.log('ID', id)
+                axios.get(`https://swapi.co/api/planets/${id}`)
+                        .then(({data}) =>{
+                            console.log(data, 'DATA')
+                          this.setState(prevState => ({
+                              homes: [...prevState.homes, data.name]
+                          }))
+                        })
+
                 const people = {
                     id: String(episode_id),
                     name,
@@ -45,22 +57,21 @@ export default class Filmes extends Component {
                     gender,
                     species, 
                     films,
-                    homeworld
+                    homeworld,
                 }
 
-                // console.log(data.homeworld)
+                console.log(homeworld, 'home')
                 this.fetchActorFilms(films)
                 this.fetchActorSpecy(species)
-                // this.fetchActorHomeworld(homeworld)
-                // console.log('HomeWorld', homeworld)
-                // console.log('AAAAAa', specy)
                 console.log(id)
 
                 this.setState(prevState => ({
                     peoples: [...prevState.peoples, people ]
                 }))
 
+
                 return people 
+          
             })
     }
 
@@ -79,40 +90,18 @@ export default class Filmes extends Component {
             })
     }
 
-    fetchActorHomeworld
-
-    // fetchActorHomeworld(homes) {
-    //     return homes &&
-    //     homes(home => {
-    //         axios.get(home)
-    //         .then(({data}) => {
-    //             this.setState(prevState => ({
-    //                 homes: [
-    //                     ...prevState.homes,
-    //                     data
-    //                 ]
-    //             }))
-    //         })
-    //     })
-    // }
-
     fetchActorSpecy(specyArray) {
         return Array.isArray(specyArray) &&
             specyArray.forEach(specy => {
                 axios.get(specy)
                     .then(({ data }) => {
-                        this.setState(prevState => ({
-                            specys: [
-                                ...prevState.specys,
-                                data
-                            ]
-                        }))
+                        this.setState({specys: data.name})
                     })
             })
     }
     
-    
     render(){
+        console.log('specys ->', this.state.specys)
         return(
             <View style = {styles.container}>
                 <View style={{flex: 1}}>
@@ -120,6 +109,7 @@ export default class Filmes extends Component {
                 <FlatList 
                     data={this.state.peoples}
                     ref='flatlist'
+                    extraData={this.state.specys || this.state.homes}
                     keyExtractor={item => item.id}
                     renderItem={({item}) =>
                     <View style={{flex: 1}}>
@@ -133,8 +123,8 @@ export default class Filmes extends Component {
                     <Icon name = "ios-arrow-round-back" color="#FFFFFF" size={35}/>
                     </TouchableOpacity>
                     </View>
-                    <View style={{marginTop: 30}}>
-                <Image style={{width: 375, height: 190}} source={require('../images/luke.jpeg')}/>
+                    <View style={{marginTop: 15}}>
+                <Image style={{width: 375, height: 190}} source={getActorImage(item.name)}/>
                 <View style={styles.borda}/>
                 <View style={styles.borda}/>
                 </View>
@@ -142,39 +132,32 @@ export default class Filmes extends Component {
                     <View style={{marginTop: 30, left: 20}}>
                         <Text style={styles.titulo}>Birth Year</Text>
                         <Text style={styles.texto}>{item.birth_year}</Text>
-                        <View style={{left: 150, marginTop: -30}}>
+                        <View style={{left: 150, marginTop: -35}}>
                         <Text style={styles.titulo}>Gender</Text>
                         <Text style={styles.texto}>{item.gender}</Text>
+                        <View style={{marginTop: 40, left: -150}}>
+                        <Text style={styles.titulo}>Specy</Text>
+                        <Text style={styles.texto}>{this.state.specys}</Text>
                         </View>
+                        <View style={{marginTop: -35}}>
+                            <Text style={styles.titulo}>HomeWorld</Text>
+                            <Text style={styles.texto}>{this.state.homes}</Text>
+                        </View>
+                        </View>
+                        <View></View>
                     </View>
-                    </View>
-                    }/>
-
-                    <FlatList 
-                    data={this.state.specys}
-                    ref='flatlist'
-                    keyExtractor={item => item.id}
-                    renderItem={({item}) =>
-                    <View style={{flex: 1}}>
-                    
-                    <View style={{left: 20, marginTop: 10}}>
-                    <Text style={styles.titulo}>
-                        Specy
-                    </Text>
-                    <Text style={styles.texto}>{item.name}</Text>
-                    </View>
-                    
                     </View>
                     }/>
                 </View>
-
+                <View>
+                    </View>
                     <View style={{right: 10}}>
                     <View style={styles.pageD}>
                     <Icon name = "ios-videocam" size={25} color = '#FFFF00'/>
                     </View>
                 </View>
                     <View style={{left:50, marginTop: -26}}>
-                    <Text style={{color: '#FFFF00', fontWeight: 'bold', fontSize: 18}}>
+                    <Text style={{color: '#FFFF00', fontWeight: 'bold', fontSize: 18, fontFamily: 'Exo-ExtraBold',}}>
                         Films
                     </Text>
                     </View>
@@ -227,12 +210,14 @@ const styles = StyleSheet.create({
     },
 
     status:{
+        fontFamily: 'Exo-ExtraBold',
         color: '#FFFF00',
         fontSize: 18,
         fontWeight: 'bold'
     },
 
     titulo: {
+        fontFamily: 'Exo-ExtraBold',
         fontSize: 12,
         color: '#FFFFFF',
     },
@@ -251,6 +236,7 @@ const styles = StyleSheet.create({
     },
 
     texto: {
+        fontFamily: 'Exo-ExtraBold',
         fontSize: 14,
         color: '#FFFFFF',
         fontWeight: 'bold',

@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import{View, Image, Text, StyleSheet, TouchableOpacity, FlatList} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import axios from 'axios';
+import { getMovieImage } from "../helpers";
 
 export default class Filmes extends Component {
 
@@ -60,11 +61,11 @@ export default class Filmes extends Component {
                     <TouchableOpacity onPress={() => this.phantom(item)}>
 
                     <View style={{alignItems: 'center',marginTop: 20}}>
-                    <Image style={{width: 150, height: 220}} source = {require('../images/starwars3.jpg')}/>
+                    <Image style={{width: 150, height: 220}} source = {getMovieImage(item.title)}/>
                     <View style={{width:180}}>
                     </View>
                     <View style={{alignItems: 'center', justifyContent: 'center',backgroundColor: '#FFFFFF',width: 150, height: 50, borderBottomLeftRadius: 5, borderBottomRightRadius:5}}>
-                    <Text style={{color: "#000000", fontSize: 14, fontWeight: 'bold'}}>{item.title}</Text>
+                    <Text style={styles.texto}>{item.title}</Text>
                     </View>
                     
                     </View>
@@ -73,19 +74,20 @@ export default class Filmes extends Component {
                     }/>
                  </View>
                 <View style={{paddingVertical: 10}}></View>
+                <View style={styles.borderT}/>
                 <View style={styles.button}>
                 <TouchableOpacity onPress={this.buttonP}>
                 <View style={styles.buttonP}>
-                    <Icon name = "ios-person" size={20}/>
-                    <Text style={styles.textButton}>
+                    <Icon name = "ios-person" color = "#808080" size={20}/>
+                    <Text style={styles.textButtonP}>
                         Personagens
                     </Text>
                 </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={this.buttonF}>
                 <View style={styles.buttonF}>
-                    <Icon name = "ios-videocam" size={20}/>
-                    <Text style={styles.textButton}>
+                    <Icon name = "ios-videocam" color = "#FFFF00" size={20}/>
+                    <Text style={styles.textButtonM}>
                         Filmes
                     </Text>
                 </View>
@@ -117,6 +119,7 @@ const styles = StyleSheet.create({
     },
 
     status:{
+        fontFamily: 'Exo-ExtraBold',
         color: '#FFFF00',
         fontSize: 18,
         fontWeight: 'bold'
@@ -130,7 +133,7 @@ const styles = StyleSheet.create({
     textTitulo:{
         color: '#FFFFFF',
         fontSize: 28,
-        //fontFamily: '',
+        fontFamily: 'Exo-ExtraBold',
     },
 
     films: {
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
         height: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFFFF'
+        backgroundColor: '#000000'
     },
 
     buttonF: {
@@ -151,11 +154,31 @@ const styles = StyleSheet.create({
         height: 60,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#FFFF00'
+        backgroundColor: '#000000'
     },
 
-    textButton: {
+    textButtonM: {
+        color: "#FFFF00",
         fontSize: 12,
+        fontFamily: 'Exo-ExtraBold',
+    },
+    textButtonP: {
+        color: "#808080",
+        fontSize: 12,
+        fontFamily: 'Exo-ExtraBold',
+    },
+
+    texto:{
+        color: '#000000',
+        fontSize: 14,
+        fontWeight: 'bold',
+        fontFamily: 'Exo-ExtraBold',
+    },
+
+    borderT: {
+        marginTop: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#FFFF00'
     },
 
     button: {

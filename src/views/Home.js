@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import{View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator} from "react-native";
 import axios from "axios";
+import {AsyncStorage} from 'react-native';
 
 export default class Home extends Component {
 
@@ -30,33 +31,59 @@ export default class Home extends Component {
         })
 
     }
+
+    _storeData = async () => {
+        try {
+          await AsyncStorage.setItem('@MySuperStore:key', 'I like to save it.');
+        } catch (error) {
+
+        }
+      };
+
+      _retrieveData = async () => {
+        try {
+          const value = await AsyncStorage.getItem('TASKS');
+          if (value !== null) {
+            console.log(value);
+          }
+        } catch (error) {
+          // Error retrieving data
+        }
+      };
     
-    fetchFilm(id) {
-        return axios.get(`https://swapi.co/api/films/${id}`)
-            .then(({data}) => {
-                const { episode_id, title } = data;
+    async fetchFilm(id) {
+         for(let i = 0; i <= 365; i++){
 
-                const film = {
-                    id: String(episode_id),
-                    title
-                }
+            await setTimeout(() => {
+                axios.get(`https://swapi.co/api/films/${id}`)
+                .then(({data}) => {
+                    const { episode_id, title } = data;
+    
+                    const film = {
+                        id: String(episode_id),
+                        title
+                    }
+    
+                    console.log(data)
+    
+                    this.setState(prevState => ({
+                        films: [...prevState.films, film ]
+                    }))
+    
+                    this.props.navigation.navigate("Filmes");
+                    return film;
+                    
+                })
 
-                console.log(data)
-
-                this.setState(prevState => ({
-                    films: [...prevState.films, film ]
-                }))
-
-                this.props.navigation.navigate("Filmes");
-                return film;
-                
-            })
+            }, 86400000)
+        }
     }
     render(){
+    
         if(this.state.isLoading) {
             return(
                 <View style={styles.container}>
-            <Image style={{width: 310, height: 191, left: 29, marginTop: 39}} source={require('../images/starwars.png')}/>
+            <Image style={{width: 310, height: 191, marginTop: 39}} source={require('../images/starwars.png')}/>
             <View style={[styles.loading]}>
             <ActivityIndicator size="large" color="#FFFF00" />
             <Text style={styles.texto}>
@@ -78,6 +105,7 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
+        alignItems: 'center',
         backgroundColor: '#000000'
     },
 
@@ -88,6 +116,7 @@ const styles = StyleSheet.create({
     },
 
     texto: {
+        fontFamily: 'Exo-ExtraBold',
         color: '#FFFFFF',
         fontSize: 12,
     }
